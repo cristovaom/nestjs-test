@@ -13,7 +13,7 @@ services:
       - sqlserver_data:/var/opt/mssql
 
   backend:
-    image: hakashow/nestjs-teste:latest
+    image: hakashow/nestjs-teste:1.0
     container_name: backend_container
     ports:
       - "3000:3000"
