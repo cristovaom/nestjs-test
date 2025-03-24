@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_container
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - sqlserver
+    environment:
+      DATABASE_URL: "sqlserver://sqlserver:1433;database=app_db;user=sa;password=YourStrong!Passw0rd;trustServerCertificate=true"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_container
+    ports:
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  sqlserver_data:
