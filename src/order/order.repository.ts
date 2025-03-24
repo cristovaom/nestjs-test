@@ -11,14 +11,20 @@ export class OrderRepository{
     async findOrderById(id: string){
         const order = await this.prisma.order.findUnique({
             where: { id: id } ,
+            include:{
+                orderItems: true
+            }
         });
         return order;
     }
 
     async findOrdersByUserActiveSession(userId: string){
-        const orders = await this.prisma.order.findMany({
-            where: { userId: userId, status: { in: ['ACTIVE', 'FINISHED','PENDING'] } } ,
-
+        const orders = await this.prisma.orderItem.findMany({
+            where: { order: { userId: userId, status: { in: ['ACTIVE', 'FINISHED','PENDING'] } } } ,
+            include:{
+                order: true,
+                product: true
+            }
         });
         if(!orders){
             throw new Error('Orders not found');
@@ -40,6 +46,9 @@ export class OrderRepository{
                 },
                 orderItems: order.orderItems
             },
+            include:{
+                orderItems: true
+            }
         });
 
         if(!newOrder){

@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { OrderService } from './order.service';
-import { OrderDto } from './dtos/order.dto';
+import { OrderDto, OrderStatus } from './dtos/order.dto';
 import { CreateOrderDto } from './dtos/create-order.dto';
 
 import { User } from '@prisma/client';
@@ -21,7 +21,6 @@ export class OrderResolver {
     })
     @UseGuards(GqlAuthGuard)
     async placeOrder(
-        @CurrentUser() user: User,
         @Args('createOrderDto') createOrderDto: CreateOrderDto
     ){
         return await this.orderService.placeOrder(createOrderDto);
@@ -33,8 +32,11 @@ export class OrderResolver {
     @UseGuards(GqlAuthGuard, AdminGuard)
     async updateOrderStatus(
         @Args('orderId') orderId: string,
-        @Args('status') status: string
+        @Args('status') status: OrderStatus
     ){
+        if(!OrderStatus[status]){
+            throw new Error('Invalid order status ' + status + ' must be one of ' + Object.values(OrderStatus).join(', '));
+        }
         return await this.orderService.updateOrderStatus(orderId, status);
     }
 

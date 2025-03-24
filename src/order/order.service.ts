@@ -19,7 +19,7 @@ export class OrderService {
     if(order.userId !== userId && userRole !== 'ADMIN'){
       throw new Error('This order is not yours');
     }
-    return this.mapToOrderDtoArray(order);
+    return order;
   }
 
   async findOrdersByUserActiveSession(userId: string) {

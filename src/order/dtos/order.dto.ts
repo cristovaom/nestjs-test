@@ -1,5 +1,13 @@
 import { Field, ObjectType, Float } from '@nestjs/graphql';
 
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  FINISHED: 'FINISHED'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
 @ObjectType()
 export class OrderDto {
   @Field(() => String)
@@ -15,9 +23,9 @@ export class OrderDto {
   totalPrice: number;
 
   @Field(() => String)
-  status: string;
+  status: OrderStatus;
 
-  @Field(() => [OrderItemDto])
+  @Field(() => [OrderItemDto!]!)
   items: OrderItemDto[];
 
   @Field(() => Date)

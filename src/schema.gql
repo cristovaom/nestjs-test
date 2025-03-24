@@ -73,8 +73,6 @@ type LoginOutputDTO {
 }
 
 type Query {
-  findByEmail(email: String!): UserOutputDTO!
-
   """Get all orders for the current user"""
   getUserOrders: [OrderDto!]!
 
