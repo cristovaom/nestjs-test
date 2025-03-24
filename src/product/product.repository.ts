@@ -38,4 +38,11 @@ export class ProductPrismaRepository {
 
 
     }
+
+    async updateProductStock(productId: string, quantity: number) {
+        return await this.prisma.product.update({
+            where: { id: productId },
+            data: { stock: { decrement: quantity } }
+        });
+    }
 }

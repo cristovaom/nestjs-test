@@ -16,6 +16,23 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type OrderDto {
+  id: String!
+  userId: String!
+  storeId: String!
+  totalPrice: Float!
+  status: String!
+  items: [OrderItemDto!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type OrderItemDto {
+  productId: String!
+  quantity: Float!
+  price: Float!
+}
+
 type ProductDto {
   id: String!
   name: String!
@@ -26,6 +43,30 @@ type ProductDto {
   updatedAt: DateTime!
 }
 
+"""Store information with statistics"""
+type StoreInfoDto {
+  """The unique identifier of the store"""
+  id: String!
+
+  """The name of the store"""
+  name: String!
+
+  """Total number of products in the store"""
+  totalProducts: Float!
+
+  """Total number of orders in the store"""
+  totalOrders: Float!
+
+  """Total revenue of the store"""
+  totalRevenue: Float!
+
+  """List of products in the store"""
+  products: [ProductDto!]!
+
+  """List of orders in the store"""
+  orders: [OrderDto!]!
+}
+
 type LoginOutputDTO {
   """JWT access token"""
   access_token: String!
@@ -33,11 +74,27 @@ type LoginOutputDTO {
 
 type Query {
   findByEmail(email: String!): UserOutputDTO!
+
+  """Get all orders for the current user"""
+  getUserOrders: [OrderDto!]!
+
+  """Get a specific order by ID"""
+  getOrderById(orderId: String!): OrderDto!
   getAvailableProducts: [ProductDto!]!
+  ecommerceState(
+    """The secret key for the store"""
+    secretKey: String!
+  ): StoreInfoDto!
 }
 
 type Mutation {
   register(user: RegisterUserDTO!): UserOutputDTO!
+
+  """Place a new order"""
+  placeOrder(createOrderDto: CreateOrderDto!): OrderDto!
+
+  """Update order status"""
+  updateOrderStatus(orderId: String!, status: String!): OrderDto!
   addProduct(input: CreateProductDto!): ProductDto!
   login(loginInput: LoginInputDTO!): LoginOutputDTO!
 }
@@ -47,6 +104,34 @@ input RegisterUserDTO {
   name: String!
   password: String!
   role: String = "CLIENT"
+}
+
+input CreateOrderDto {
+  """Status of the order"""
+  status: String
+
+  """Creation date of the order"""
+  createdAt: DateTime
+
+  """Last update date of the order"""
+  updatedAt: DateTime
+
+  """User ID who placed the order"""
+  userId: String!
+
+  """Store ID where the order is placed"""
+  storeId: String!
+
+  """Items in the order"""
+  orderItems: [OrderItemInput!]
+}
+
+input OrderItemInput {
+  """Product ID"""
+  productId: String!
+
+  """Quantity of the product"""
+  quantity: Float!
 }
 
 input CreateProductDto {

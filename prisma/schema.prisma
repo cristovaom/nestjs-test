@@ -39,7 +39,7 @@ model Store {
   owner       User      @relation(fields: [ownerId], references: [id])
   products    Product[]
   orders      Order[]
-
+  @@unique([secretKey])
   @@map("tb_stores")
 }
 

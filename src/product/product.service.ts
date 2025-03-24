@@ -13,4 +13,8 @@ export class ProductService {
     async getAvailableProducts() {
         return await this.productRepository.getAvailableProducts();
     }
+
+    async updateProductStock(productId: string, quantity: number) {
+        return await this.productRepository.updateProductStock(productId, quantity);
+    }
 }
