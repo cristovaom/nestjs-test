@@ -5,6 +5,20 @@
 ## 🌟 Visão Geral
 Esta é uma API GraphQL para uma plataforma de e-commerce que gerencia usuários, lojas, produtos e pedidos. A API utiliza autenticação JWT e inclui controle de acesso baseado em funções.
 
+
+## 🚀 Começando
+1. Clone o repositório
+2. Copie as variaveis de ambiente do .env.example e cole igual no .env , pois assim o banco já estará configurado
+3. Execute o Docker com docker-compose --up
+
+## 🔧 Variáveis de Ambiente
+Certifique-se de configurar estas variáveis de ambiente:
+```env
+DATABASE_URL="sqlserver://..."
+JWT_SECRET="seu-segredo-jwt"
+```
+
+
 ## ⚠️ Contas para Teste
 Todos os dados de teste são gerados usando Faker.js. Use estas contas para teste:
 - **Conta de Administrador**:
@@ -208,53 +222,101 @@ query ObterEstatisticasLoja {
   Authorization: Bearer <seu-token-jwt>
   ```
 
-## 📊 Modelos de Dados
+## 📊 Modelo de Dados
 
-### Usuário
-- id: UUID
-- name: String (Nome)
-- email: String (único)
-- password: String (criptografado)
-- role: String (ADMIN ou CLIENT)
-- createdAt: DateTime (Data de Criação)
-- updatedAt: DateTime (Data de Atualização)
+> Os dados abaixo representam a estrutura da aplicação e estão diretamente alinhados ao banco de dados modelado via Prisma e armazenado no SQL Server.
 
-### Loja
-- id: UUID
-- name: String (Nome)
-- ownerId: UUID (referência ao Usuário)
-- secretKey: UUID (Chave Secreta)
-- createdAt: DateTime (Data de Criação)
-- updatedAt: DateTime (Data de Atualização)
+---
 
-### Produto
-- id: UUID
-- name: String (Nome)
-- description: String (Descrição)
-- price: Decimal (Preço)
-- stock: Integer (Estoque)
-- status: String (Status)
-- storeId: UUID (ID da Loja)
-- createdAt: DateTime (Data de Criação)
-- updatedAt: DateTime (Data de Atualização)
+### 🧑‍💼 Usuário (`User`)
 
-### Pedido
-- id: UUID
-- userId: UUID (ID do Usuário)
-- storeId: UUID (ID da Loja)
-- totalPrice: Decimal (Preço Total)
-- status: String (Status)
-- createdAt: DateTime (Data de Criação)
-- updatedAt: DateTime (Data de Atualização)
+| Campo     | Tipo     | Descrição                                 |
+|-----------|----------|---------------------------------------------|
+| `id`      | UUID     | Identificador único do usuário              |
+| `name`    | String   | Nome completo                               |
+| `email`   | String   | Email do usuário (único)                    |
+| `password`| String   | Senha criptografada                         |
+| `role`    | String   | Papel do usuário (`ADMIN` ou `CLIENT`)      |
+| `createdAt` | DateTime | Data de criação do registro              |
+| `updatedAt` | DateTime | Data da última atualização               |
 
-## 🚀 Começando
-1. Clone o repositório
-2. Copie as variaveis de ambiente do .env.example e cole igual no .env , pois assim o banco já estará configurado
-3. Execute o Docker com docker-compose --up
+**Relacionamentos:**
+- 1:1 com `Store` (um usuário pode ser dono de uma loja)
+- 1:N com `Order` (um usuário pode ter vários pedidos)
 
-## 🔧 Variáveis de Ambiente
-Certifique-se de configurar estas variáveis de ambiente:
-```env
-DATABASE_URL="sqlserver://..."
-JWT_SECRET="seu-segredo-jwt"
-```
+---
+
+### 🏬 Loja (`Store`)
+
+| Campo      | Tipo     | Descrição                                 |
+|------------|----------|---------------------------------------------|
+| `id`       | UUID     | Identificador único da loja                 |
+| `name`     | String   | Nome da loja                                |
+| `ownerId`  | UUID     | Referência ao `User` dono da loja           |
+| `secretKey`| UUID     | Chave secreta para autenticação da loja     |
+| `createdAt`| DateTime | Data de criação do registro                 |
+| `updatedAt`| DateTime | Data da última atualização                  |
+
+**Relacionamentos:**
+- 1:1 com `User` (dono)
+- 1:N com `Product` (produtos da loja)
+- 1:N com `Order` (pedidos realizados na loja)
+
+---
+
+### 📦 Produto (`Product`)
+
+| Campo        | Tipo     | Descrição                                 |
+|--------------|----------|---------------------------------------------|
+| `id`         | UUID     | Identificador único do produto              |
+| `name`       | String   | Nome do produto                             |
+| `description`| String   | Descrição detalhada do produto              |
+| `price`      | Decimal  | Preço do produto (2 casas decimais)         |
+| `stock`      | Int      | Quantidade em estoque                       |
+| `status`     | String   | Status do produto (`ACTIVE`, etc)           |
+| `storeId`    | UUID     | Referência à loja proprietária              |
+| `createdAt`  | DateTime | Data de criação do registro                 |
+| `updatedAt`  | DateTime | Data da última atualização                  |
+
+**Relacionamentos:**
+- N:1 com `Store`
+- 1:N com `OrderItem` (produto pode estar em vários pedidos)
+
+---
+
+### 🧾 Pedido (`Order`)
+
+| Campo        | Tipo     | Descrição                                 |
+|--------------|----------|---------------------------------------------|
+| `id`         | UUID     | Identificador único do pedido               |
+| `userId`     | UUID     | Referência ao usuário que fez o pedido      |
+| `storeId`    | UUID     | Referência à loja onde o pedido foi feito  |
+| `totalPrice` | Decimal  | Valor total do pedido                       |
+| `status`     | String   | Status do pedido (`PENDING`, etc)           |
+| `createdAt`  | DateTime | Data de criação do pedido                   |
+| `updatedAt`  | DateTime | Data da última atualização                  |
+
+**Relacionamentos:**
+- N:1 com `User`
+- N:1 com `Store`
+- 1:N com `OrderItem`
+
+---
+
+### 📦 Item do Pedido (`OrderItem`)
+
+| Campo        | Tipo     | Descrição                                 |
+|--------------|----------|---------------------------------------------|
+| `id`         | UUID     | Identificador único do item                 |
+| `orderId`    | UUID     | Referência ao pedido                        |
+| `productId`  | UUID     | Referência ao produto comprado              |
+| `quantity`   | Int      | Quantidade do produto no pedido             |
+| `price`      | Decimal  | Preço unitário do produto                   |
+| `createdAt`  | DateTime | Data de criação do item                     |
+| `updatedAt`  | DateTime | Data da última atualização                  |
+
+**Relacionamentos:**
+- N:1 com `Order`
+- N:1 com `Product`
+
+---
