@@ -18,6 +18,8 @@ DATABASE_URL="sqlserver://..."
 JWT_SECRET="seu-segredo-jwt"
 ```
 
+### Deploy:
+A Imagem do dockerfile do back-end está no dockerhub , e estou utilizando o nginx para fazer proxy-reverso da porta 3000 para 8080 , também poderia usar para https.
 
 ## ⚠️ Contas para Teste
 Todos os dados de teste são gerados usando Faker.js. Use estas contas para teste:
