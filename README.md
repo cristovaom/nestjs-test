@@ -8,7 +8,7 @@ Esta é uma API GraphQL para uma plataforma de e-commerce que gerencia usuários
 
 ## 🚀 Começando
 1. Clone o repositório
-2. Copie as variaveis de ambiente do .env.example e cole igual no .env , pois assim o banco já estará configurado
+2. Copie as variaveis de ambiente do .env.example e crie um arquivo chamado no .env e cole igual no .env.example , pois assim o banco já estará configurado
 3. Execute o Docker com docker-compose --up
 
 ## 🔧 Variáveis de Ambiente
