@@ -25,14 +25,14 @@ export class OrderDto {
   @Field(() => String)
   status: OrderStatus;
 
-  @Field(() => [OrderItemDto!]!)
-  items: OrderItemDto[];
+  @Field(() => [OrderItemDto], { nullable: true })
+  items?: OrderItemDto[];
 
-  @Field(() => Date)
-  createdAt: Date;
+  @Field(() => Date, { nullable: true })
+  createdAt?: Date;
 
-  @Field(() => Date)
-  updatedAt: Date;
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }
 
 @ObjectType()

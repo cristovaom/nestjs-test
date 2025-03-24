@@ -1,98 +1,260 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📚 Documentação da API GraphQL E-commerce
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## 🌟 Visão Geral
+Esta é uma API GraphQL para uma plataforma de e-commerce que gerencia usuários, lojas, produtos e pedidos. A API utiliza autenticação JWT e inclui controle de acesso baseado em funções.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## ⚠️ Contas para Teste
+Todos os dados de teste são gerados usando Faker.js. Use estas contas para teste:
+- **Conta de Administrador**:
+  - Email: email0@gmail.com
+  - Função: ADMIN
+- **Contas de Cliente**:
+  - Emails: email1@gmail.com até email4@gmail.com
+  - Função: CLIENT
+- **Senha para todas as contas**: senha
 
-## Project setup
+### URL: http://localhost:8080/graphql
 
-```bash
-$ npm install
+### LEMBRE SEMPRE DE TROCAR Os UserIds,StoreIds e ProductIds , OrderIds para o do seu banco , já que foi gerado usando fakerJs é aleatorio, então de uma olhada no seu Banco de dados.
+
+## 🔐 Autenticação
+
+### Login
+```graphql
+mutation Login {
+  login(loginInput: {
+    email: "email0@gmail.com"
+    password: "senha"
+  }) {
+    access_token
+  }
+}
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+### Registrar Novo Usuário
+```graphql
+mutation Registrar {
+  register(user: {
+    email: "novousuario@exemplo.com"
+    name: "Novo Usuário"
+    password: "senha123"
+    role: "CLIENT"  # Opcional, padrão é "CLIENT"
+  }) {
+    id
+    name
+    email
+    role
+    createdAt
+    updatedAt
+  }
+}
 ```
 
-## Run tests
+## 📦 Produtos
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+### Adicionar Novo Produto
+```graphql
+mutation AdicionarProduto {
+  addProduct(input: {
+    name: "Nome do Produto"
+    description: "Descrição do Produto"
+    price: 99.99
+    stock: 100
+    storeId: "id-da-loja"
+  }) {
+    id
+    name
+    description
+    price
+    stock
+    createdAt
+    updatedAt
+  }
+}
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
+### Obter Produtos Disponíveis
+```graphql
+query ObterProdutos {
+  getAvailableProducts {
+    id
+    name
+    description
+    price
+    stock
+    createdAt
+    updatedAt
+  }
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🛍️ Pedidos
 
-## Resources
+- Esse endpoint verifica se tem estoque desse pedido dísponivel,
+- Após o pedido ser feito ele dá baixa automaticamente do estoque
+- E basta colocar a quantidade que ele vai somar automaticamente
 
-Check out a few resources that may come in handy when working with NestJS:
+### Fazer Novo Pedido
+```graphql
+mutation FazerPedido {
+  placeOrder(createOrderDto: {
+    userId: "id-do-usuario"
+    storeId: "id-da-loja"
+    orderItems: [
+      {
+        productId: "id-do-produto"
+        quantity: 2
+      }
+    ]
+  }) {
+    id
+    totalPrice
+    status
+    items {
+      productId
+      quantity
+      price
+    }
+    createdAt
+    updatedAt
+  }
+}
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Obter Pedidos do Usuário
+```graphql
+query ObterPedidosUsuario {
+  getUserOrders {
+    id
+    totalPrice
+    status
+    items {
+      productId
+      quantity
+      price
+    }
+    createdAt
+    updatedAt
+  }
+}
+```
 
-## Support
+### Obter Pedido Específico
+```graphql
+query ObterPedido {
+  getOrderById(orderId: "id-do-pedido") {
+    id
+    userId
+    storeId
+    totalPrice
+    status
+    items {
+      productId
+      quantity
+      price
+    }
+    createdAt
+    updatedAt
+  }
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Atualizar Status do Pedido
+```graphql
+mutation AtualizarStatusPedido {
+  updateOrderStatus(
+    orderId: "id-do-pedido"
+    status: "COMPLETED"
+  ) {
+    id
+    status
+    updatedAt
+  }
+}
+```
 
-## Stay in touch
+## 🏪 Loja
+Basta copiar a chave secretKey da tabela , ela pode estar hasheada mas é pegar ela e colar no lugar da chave-secreta e vai funcionar!
+### Obter Estatísticas da Loja
+```graphql
+query ObterEstatisticasLoja {
+  ecommerceState(secretKey: "chave-secreta-da-loja") {
+    id
+    name
+    totalProducts
+    totalOrders
+    totalRevenue
+    products {
+      id
+      name
+      price
+    }
+    orders {
+      id
+      totalPrice
+      status
+    }
+  }
+}
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🔑 Requisitos de Autenticação
 
-## License
+- Todas as mutations e queries (exceto login e registro) requerem um token JWT válido
+- O token deve ser incluído no cabeçalho Authorization:
+  ```
+  Authorization: Bearer <seu-token-jwt>
+  ```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 📊 Modelos de Dados
+
+### Usuário
+- id: UUID
+- name: String (Nome)
+- email: String (único)
+- password: String (criptografado)
+- role: String (ADMIN ou CLIENT)
+- createdAt: DateTime (Data de Criação)
+- updatedAt: DateTime (Data de Atualização)
+
+### Loja
+- id: UUID
+- name: String (Nome)
+- ownerId: UUID (referência ao Usuário)
+- secretKey: UUID (Chave Secreta)
+- createdAt: DateTime (Data de Criação)
+- updatedAt: DateTime (Data de Atualização)
+
+### Produto
+- id: UUID
+- name: String (Nome)
+- description: String (Descrição)
+- price: Decimal (Preço)
+- stock: Integer (Estoque)
+- status: String (Status)
+- storeId: UUID (ID da Loja)
+- createdAt: DateTime (Data de Criação)
+- updatedAt: DateTime (Data de Atualização)
+
+### Pedido
+- id: UUID
+- userId: UUID (ID do Usuário)
+- storeId: UUID (ID da Loja)
+- totalPrice: Decimal (Preço Total)
+- status: String (Status)
+- createdAt: DateTime (Data de Criação)
+- updatedAt: DateTime (Data de Atualização)
+
+## 🚀 Começando
+1. Clone o repositório
+2. Copie as variaveis de ambiente do .env.example e cole igual no .env , pois assim o banco já estará configurado
+3. Execute o Docker com docker-compose --up
+
+## 🔧 Variáveis de Ambiente
+Certifique-se de configurar estas variáveis de ambiente:
+```env
+DATABASE_URL="sqlserver://..."
+JWT_SECRET="seu-segredo-jwt"
+```

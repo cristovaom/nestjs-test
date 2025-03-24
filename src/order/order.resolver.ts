@@ -23,7 +23,8 @@ export class OrderResolver {
     async placeOrder(
         @Args('createOrderDto') createOrderDto: CreateOrderDto
     ){
-        return await this.orderService.placeOrder(createOrderDto);
+         const order = await this.orderService.placeOrder(createOrderDto);
+         return order;
     }
 
     @Mutation(() => OrderDto, {

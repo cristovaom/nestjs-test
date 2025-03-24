@@ -19,7 +19,13 @@ export class OrderService {
     if(order.userId !== userId && userRole !== 'ADMIN'){
       throw new Error('This order is not yours');
     }
-    return order;
+    return {
+      id: order.id,
+      userId: order.userId,
+      storeId: order.storeId,
+      totalPrice: order.totalPrice,
+      status: order.status,
+    };
   }
 
   async findOrdersByUserActiveSession(userId: string) {
@@ -110,7 +116,7 @@ export class OrderService {
       }
 
       const orderDto = orderMap.get(order.id);
-      orderDto?.items.push({
+      orderDto?.items?.push({
         productId,
         quantity,
         price: Number(price),

@@ -1,13 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker/locale/en';
-import bcrypt from 'bcryptjs';
+const { PrismaClient }  = require('@prisma/client');
+const { faker } = require('@faker-js/faker/locale/en');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
-
 async function main() {
   console.log('Starting seed...');
-
-  // Create users
-  const users: any[] = [];
+  const users = [];
   for (let i = 0; i < 5; i++) {
     const user = await prisma.user.create({
       data: {
@@ -21,8 +18,8 @@ async function main() {
     console.log(`Created user: ${user.name}`);
   }
 
-  // Create stores for some users
-  const stores: any[] = [];
+
+  const stores = [];
   for (let i = 0; i < 3; i++) {
     const store = await prisma.store.create({
       data: {
@@ -35,8 +32,8 @@ async function main() {
     console.log(`Created store: ${store.name}`);
   }
 
-  // Create products for each store
-  const products: any[] = [];
+
+  const products = [];
   for (const store of stores) {
     for (let i = 0; i < 5; i++) {
       const product = await prisma.product.create({
@@ -54,17 +51,17 @@ async function main() {
     }
   }
 
-  // Create orders
+
   for (let i = 1; i < users.length; i++) {
     const storeIndex = faker.number.int({ min: 0, max: stores.length - 1 });
     const store = stores[storeIndex];
 
-    // Get products from this store
+
     const storeProducts = products.filter(p => p.storeId === store.id);
 
-    // Create order with 1-3 items
+
     const itemCount = faker.number.int({ min: 1, max: 3 });
-    const orderItems: any[] = [];
+    const orderItems = [];
     let totalPrice = 0;
 
     for (let j = 0; j < itemCount; j++) {
@@ -106,7 +103,9 @@ async function main() {
 main()
   .catch((e) => {
     console.error(e);
-    process.exit(1);
+    console.log('Seed failed');
+
+    console.log('Continuing despite seed failure');
   })
   .finally(async () => {
     await prisma.$disconnect();
