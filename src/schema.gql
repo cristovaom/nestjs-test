@@ -1,0 +1,66 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserOutputDTO {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProductDto {
+  id: String!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type LoginOutputDTO {
+  """JWT access token"""
+  access_token: String!
+}
+
+type Query {
+  findByEmail(email: String!): UserOutputDTO!
+  getAvailableProducts: [ProductDto!]!
+}
+
+type Mutation {
+  register(user: RegisterUserDTO!): UserOutputDTO!
+  addProduct(input: CreateProductDto!): ProductDto!
+  login(loginInput: LoginInputDTO!): LoginOutputDTO!
+}
+
+input RegisterUserDTO {
+  email: String!
+  name: String!
+  password: String!
+  role: String = "CLIENT"
+}
+
+input CreateProductDto {
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  storeId: String!
+}
+
+input LoginInputDTO {
+  """User email address"""
+  email: String!
+
+  """User password"""
+  password: String!
+}

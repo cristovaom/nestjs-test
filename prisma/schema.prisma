@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String    @db.VarChar(255)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  role      String    @default("CLIENT")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+
+  store     Store?
+  orders    Order[]
+
+  @@map("tb_users")
+}
+
+model Store {
+  id          String    @id @default(uuid())
+  name        String    @db.VarChar(255)
+  ownerId     String    @map("owner_id") @unique
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime?  @updatedAt @map("updated_at")
+  secretKey   String    @default(uuid()) @map("secret_key")
+
+  owner       User      @relation(fields: [ownerId], references: [id])
+  products    Product[]
+  orders      Order[]
+
+  @@map("tb_stores")
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  name        String         @db.VarChar(255)
+  description String
+  price       Decimal        @db.Decimal(10, 2)
+  stock       Int
+  status      String  @default("ACTIVE")
+  storeId     String         @map("store_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime?      @updatedAt @map("updated_at")
+
+  store       Store          @relation(fields: [storeId], references: [id])
+  orderItems  OrderItem[]
+
+  @@map("tb_products")
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String      @map("user_id")
+  storeId    String      @map("store_id")
+  totalPrice Decimal     @db.Decimal(10, 2) @map("total_price")
+  status     String      @default("PENDING")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime?   @updatedAt @map("updated_at")
+
+  user       User        @relation(fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  store      Store       @relation(fields: [storeId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  orderItems OrderItem[]
+
+  @@map("tb_orders")
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String   @map("order_id")
+  productId  String   @map("product_id")
+  quantity   Int
+  price      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime? @updatedAt @map("updated_at")
+
+  order      Order    @relation(fields: [orderId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  product    Product  @relation(fields: [productId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("tb_order_items")
+}
