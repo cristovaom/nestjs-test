@@ -218,7 +218,7 @@ query ObterEstatisticasLoja {
 
 ## 🔑 Requisitos de Autenticação
 
-- Todas as mutations e queries (exceto login e registro) requerem um token JWT válido
+- Todas as mutations e queries (exceto login e ecommerce-stats) requerem um token JWT válido
 - O token deve ser incluído no cabeçalho Authorization:
   ```
   Authorization: Bearer <seu-token-jwt>
